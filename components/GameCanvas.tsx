@@ -3,7 +3,6 @@ import {
   CANVAS_WIDTH, 
   CANVAS_HEIGHT, 
   GRAVITY, 
-  JUMP_FORCE, 
   MOVE_SPEED, 
   PLAYER_WIDTH, 
   PLAYER_HEIGHT,
@@ -13,7 +12,6 @@ import {
   PLATFORM_GAP_MAX,
   PLATFORM_SPEED_BASE,
   PLATFORM_SPEED_INC,
-  SPIKE_DAMAGE,
   CEILING_DAMAGE,
   BOUNCE_FORCE,
   PLATFORM_TYPES_DISTRIBUTION,
@@ -72,7 +70,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ gameState, onGameOver })
     playersRef.current = [
       {
         id: 1,
-        name: 'Player 1',
+        name: '玩家 1',
         x: CANVAS_WIDTH / 3 - PLAYER_WIDTH / 2,
         y: 100,
         width: PLAYER_WIDTH,
@@ -88,7 +86,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ gameState, onGameOver })
       },
       {
         id: 2,
-        name: 'Player 2',
+        name: '玩家 2',
         x: (CANVAS_WIDTH / 3) * 2 - PLAYER_WIDTH / 2,
         y: 100,
         width: PLAYER_WIDTH,
@@ -174,7 +172,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ gameState, onGameOver })
       // Ceiling collision (Spikes at y=0)
       if (player.y < 20) { // Top spike zone
         player.hp -= CEILING_DAMAGE;
-        player.lastDamageSource = "Ceiling Spikes";
+        player.lastDamageSource = "上方尖刺";
         // Force push down slightly
         player.y = 20;
         player.vy = 1; 
@@ -183,7 +181,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ gameState, onGameOver })
       // Floor collision (Death)
       if (player.y > CANVAS_HEIGHT) {
         player.hp = 0;
-        player.lastDamageSource = "The Void";
+        player.lastDamageSource = "摔落深淵";
       }
 
       // Platform Collisions
@@ -206,26 +204,19 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ gameState, onGameOver })
             // Apply Platform Effects
             if (plat.type === PlatformType.SPIKE) {
               player.hp -= 1; // Continuous damage while standing
-              player.lastDamageSource = "Spike Platform";
+              player.lastDamageSource = "尖刺踏板";
             } else if (plat.type === PlatformType.BOUNCY) {
               player.vy = BOUNCE_FORCE;
               onPlatform = false; // Don't stick
             } else if (plat.type === PlatformType.BREAKABLE) {
                 if (!plat.touched) {
-                    plat.touched = true; // Visual cue or delayed break could go here
-                    // For now, instant break logic handled by filtering later? 
-                    // Actually, simpler: make it a normal platform that disappears quickly.
-                    // Let's just bounce them slightly and remove platform?
-                    // Or standard NS-Shaft style: you stand, it breaks after X ms.
-                    // Implementing instant break for simplicity -> turned to 'ghost' platform
+                    plat.touched = true;
                 }
             } else if (plat.type === PlatformType.LEFT_CONVEYOR) {
               player.x -= 2;
             } else if (plat.type === PlatformType.RIGHT_CONVEYOR) {
               player.x += 2;
             }
-            
-            // Regenerate HP slowly if on normal platform? No, too easy.
           }
         }
       }
@@ -242,11 +233,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ gameState, onGameOver })
       }
     });
 
-    // Remove Broken Platforms (simulated by filtering touched breakables if we implemented delay, 
-    // but for now let's say breakables break instantly upon landing? 
-    // Let's make them traverse through: collision logic above handles "solidness".
-    // If it's breakable, let's make it non-solid immediately after first touch frame?
-    // Simplification: Breakable = Disappears if touched.
+    // Remove Broken Platforms
     platformsRef.current = platformsRef.current.filter(p => !(p.type === PlatformType.BREAKABLE && p.touched));
 
     // Sync UI State
@@ -372,6 +359,10 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ gameState, onGameOver })
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent scrolling with arrow keys/space
+      if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+          e.preventDefault();
+      }
       keysPressedRef.current.add(e.code);
     };
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -411,7 +402,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ gameState, onGameOver })
       {/* HUD Overlay */}
       <div className="absolute top-4 left-4 right-4 flex justify-between text-white font-pixel text-xs md:text-sm pointer-events-none">
         <div className="flex flex-col items-start">
-          <div className="text-blue-400 font-bold mb-1">PLAYER 1 (WASD)</div>
+          <div className="text-blue-400 font-bold mb-1">玩家 1 (WASD)</div>
           <div className="w-32 h-4 bg-gray-700 rounded border border-gray-500 overflow-hidden">
             <div 
               className="h-full bg-blue-500 transition-all duration-100" 
@@ -420,12 +411,12 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ gameState, onGameOver })
           </div>
         </div>
 
-        <div className="text-yellow-400 text-xl animate-pulse">
-            DEPTH: {score}m
+        <div className="text-yellow-400 text-xl animate-pulse text-center">
+            深度<br/>{score}層
         </div>
 
         <div className="flex flex-col items-end">
-          <div className="text-red-400 font-bold mb-1">PLAYER 2 (ARROWS)</div>
+          <div className="text-red-400 font-bold mb-1">玩家 2 (箭頭鍵)</div>
           <div className="w-32 h-4 bg-gray-700 rounded border border-gray-500 overflow-hidden">
             <div 
               className="h-full bg-red-500 transition-all duration-100" 

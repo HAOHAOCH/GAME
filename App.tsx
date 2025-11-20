@@ -24,9 +24,7 @@ const App: React.FC = () => {
     // Trigger AI Commentary
     setIsLoadingCommentary(true);
     
-    // Determine winner (whoever died last, or highest score if simultaneous? 
-    // Simpler: Player with more HP is winner? No, everyone is dead in Game Over logic provided.
-    // Let's assume the one with higher score won.)
+    // Determine winner
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
     const winner = sortedPlayers[0];
     const loser = sortedPlayers[1];
@@ -51,10 +49,10 @@ const App: React.FC = () => {
         {/* Header */}
         <header className="mb-6 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 font-pixel mb-2 drop-shadow-lg">
-            DUNGEON DROP
+            小朋友下樓梯
           </h1>
           <p className="text-slate-400 font-pixel text-xs md:text-sm">
-            2-PLAYER SURVIVAL • VS MODE
+            雙人對戰版 • 活下去！
           </p>
         </header>
 
@@ -63,7 +61,7 @@ const App: React.FC = () => {
              <div className="space-y-4">
                 <div className="flex items-center justify-center space-x-4 mb-8">
                     <div className="bg-slate-800 p-4 rounded-lg border border-blue-500/30">
-                        <p className="text-blue-400 font-bold mb-2 font-pixel text-xs">PLAYER 1</p>
+                        <p className="text-blue-400 font-bold mb-2 font-pixel text-xs">玩家 1</p>
                         <div className="flex gap-2 justify-center">
                             <kbd className="px-2 py-1 bg-slate-700 rounded text-white font-mono text-sm border-b-2 border-slate-600">A</kbd>
                             <kbd className="px-2 py-1 bg-slate-700 rounded text-white font-mono text-sm border-b-2 border-slate-600">D</kbd>
@@ -71,7 +69,7 @@ const App: React.FC = () => {
                     </div>
                     <div className="text-slate-500 font-bold font-pixel">VS</div>
                     <div className="bg-slate-800 p-4 rounded-lg border border-red-500/30">
-                        <p className="text-red-400 font-bold mb-2 font-pixel text-xs">PLAYER 2</p>
+                        <p className="text-red-400 font-bold mb-2 font-pixel text-xs">玩家 2</p>
                         <div className="flex gap-2 justify-center">
                             <kbd className="px-2 py-1 bg-slate-700 rounded text-white font-mono text-sm border-b-2 border-slate-600">←</kbd>
                             <kbd className="px-2 py-1 bg-slate-700 rounded text-white font-mono text-sm border-b-2 border-slate-600"> →</kbd>
@@ -82,21 +80,21 @@ const App: React.FC = () => {
                 <div className="text-left space-y-2 text-sm text-slate-300 bg-slate-800/50 p-4 rounded-lg">
                     <div className="flex items-center gap-2">
                         <ArrowDownCircle className="w-4 h-4 text-green-400" />
-                        <span>Fall down to survive.</span>
+                        <span>往下跳，不要被上方尖刺刺到</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <ShieldAlert className="w-4 h-4 text-red-400" />
-                        <span>Avoid ceiling spikes & floor limits.</span>
+                        <span>小心陷阱與摔出畫面外</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <Trophy className="w-4 h-4 text-yellow-400" />
-                        <span>Outlast your opponent!</span>
+                        <span>看誰下得最深！</span>
                     </div>
                 </div>
              </div>
 
              <Button onClick={handleStartGame} className="w-full py-4 text-lg flex items-center justify-center gap-2">
-                <Play className="w-5 h-5" /> START GAME
+                <Play className="w-5 h-5" /> 開始遊戲
              </Button>
           </div>
         )}
@@ -107,7 +105,7 @@ const App: React.FC = () => {
 
         {gameState === GameState.GAME_OVER && matchResult && (
            <div className="bg-slate-900 p-8 rounded-2xl shadow-2xl border border-slate-700 max-w-md w-full text-center space-y-6 animate-fade-in-up">
-              <h2 className="text-3xl font-pixel text-white mb-4">GAME OVER</h2>
+              <h2 className="text-3xl font-pixel text-white mb-4">遊戲結束</h2>
               
               <div className="grid grid-cols-2 gap-4">
                 {matchResult.players.map(p => (
@@ -115,9 +113,9 @@ const App: React.FC = () => {
                         <p className={`font-bold font-pixel text-sm mb-2 ${p.id === 1 ? 'text-blue-400' : 'text-red-400'}`}>
                             {p.name}
                         </p>
-                        <p className="text-2xl text-white font-mono">{Math.floor(p.score)}m</p>
+                        <p className="text-2xl text-white font-mono">{Math.floor(p.score)}層</p>
                         {p.lastDamageSource && (
-                            <p className="text-xs text-slate-400 mt-2">Cause: {p.lastDamageSource}</p>
+                            <p className="text-xs text-slate-400 mt-2">死因: {p.lastDamageSource}</p>
                         )}
                     </div>
                 ))}
@@ -127,7 +125,7 @@ const App: React.FC = () => {
               <div className="bg-black/40 rounded-lg p-4 border border-slate-700 text-left relative overflow-hidden min-h-[100px]">
                  <div className="flex items-center gap-2 mb-2 border-b border-slate-700 pb-2">
                     <Info className="w-4 h-4 text-purple-400" />
-                    <span className="text-xs font-bold text-purple-300 uppercase tracking-wider">AI Match Analysis</span>
+                    <span className="text-xs font-bold text-purple-300 uppercase tracking-wider">AI 賽評講評</span>
                  </div>
                  {isLoadingCommentary ? (
                     <div className="flex items-center justify-center h-16 space-x-2">
@@ -144,10 +142,10 @@ const App: React.FC = () => {
 
               <div className="flex gap-4">
                   <Button onClick={() => setGameState(GameState.MENU)} variant="secondary" className="flex-1">
-                    MENU
+                    回主選單
                   </Button>
                   <Button onClick={handleStartGame} className="flex-1 flex items-center justify-center gap-2">
-                    <RotateCcw className="w-4 h-4" /> REMATCH
+                    <RotateCcw className="w-4 h-4" /> 再玩一場
                   </Button>
               </div>
            </div>
